@@ -1,0 +1,11 @@
+app = "bombsquad-android-server" # اختر اسم فريد لتطبيقك
+primary_region = "fra" # منطقة فرانكفورت (أو القريبة لك)
+
+[build]
+
+[[services]]
+  internal_port = 43210
+  protocol = "udp"
+
+  [[services.ports]]
+    port = 43210
