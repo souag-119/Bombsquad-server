@@ -1,17 +1,20 @@
 FROM python:3.10-slim
 
-# تثبيت الأدوات والمكتبات الأساسية للتشغيل
+# تثبيت الأدوات المطلوبة
 RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     wget \
     libcurl4 \
+    jq \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# تحميل وتفكيك سيرفر BombSquad الرسمي
-RUN wget https://files.ballistica.net/bombsquad/builds/BombSquad_Server_Linux_x86_64_v1.7.35.tar.gz -O server.tar.gz \
+# جلب أحدث رابط لسيرفر BombSquad Linux تلقائياً وتحميله
+RUN DOWNLOAD_URL=$(curl -s https://ballistica.net/downloads | grep -oP 'https://files\.ballistica\.net/bombsquad/builds/BombSquad_Server_Linux_x86_64_[^"]+\.tar\.gz' | head -n 1) \
+    && if [ -z "$DOWNLOAD_URL" ]; then DOWNLOAD_URL="https://files.ballistica.net/bombsquad/builds/BombSquad_Server_Linux_x86_64_v1.7.36.tar.gz"; fi \
+    && wget "$DOWNLOAD_URL" -O server.tar.gz \
     && tar -xzf server.tar.gz --strip-components=1 \
     && rm server.tar.gz
 
