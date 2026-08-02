@@ -6,7 +6,6 @@ RUN apt-get update && apt-get install -y \
     unzip \
     wget \
     libcurl4 \
-    jq \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -17,6 +16,10 @@ RUN DOWNLOAD_URL=$(curl -s https://ballistica.net/downloads | grep -oP 'https://
     && wget "$DOWNLOAD_URL" -O server.tar.gz \
     && tar -xzf server.tar.gz --strip-components=1 \
     && rm server.tar.gz
+
+# حل مشكلة python3.14 بواسطة إنشاء Symlinks
+RUN ln -sf $(which python3) /usr/local/bin/python3.14 && \
+    ln -sf $(which python3) /usr/bin/python3.14
 
 # نسخ ملف الإعدادات
 COPY config.py /app/config.py
