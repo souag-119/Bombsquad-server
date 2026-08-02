@@ -1,2 +1,0 @@
-# Bombsquad-server
-Ssss
