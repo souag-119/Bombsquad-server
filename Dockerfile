@@ -1,6 +1,6 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-# تثبيت الأدوات والمكتبات اللازمة للعبة
+# تثبيت الأدوات والمكتبات اللازمة
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
@@ -18,7 +18,7 @@ RUN DOWNLOAD_URL=$(curl -s https://ballistica.net/downloads | grep -oP 'https://
     && tar -xzf server.tar.gz --strip-components=1 \
     && rm server.tar.gz
 
-# ربط python3.14 و python3 بحزمة Python 3.11 الحالية (التي تحتوي على tomllib)
+# ربط المسارات بـ Python 3.12 الجديد
 RUN ln -sf $(which python3) /usr/bin/python3.14 && \
     ln -sf $(which python3) /usr/local/bin/python3.14
 
@@ -28,5 +28,5 @@ COPY config.py /app/config.py
 # فتح المنفذ الخاص بـ Render
 EXPOSE 10000
 
-# تشغيل السيرفر بدون شاشة تفاعلية
+# تشغيل السيرفر في الخلفية
 CMD ["./bombsquad_server", "-no-stdin"]
