@@ -1,16 +1,16 @@
-# config.py - BombSquad Dedicated Server Configuration
+# config.py - BombSquad Server Config
 
-# اسم السيرفر الذي سيظهر في اللعبة
+# اسم السيرفر
 party_name = "Android Public Server - Render"
 
-# أقصى عدد للاعبين
+# أقصى عدد لاعبين
 max_party_size = 8
 
-# جعل السيرفر عاماً ليظهر في قائمة الأونلاين للأندرويد
+# جعل السيرفر علنياً في القائمة العامة للأندرويد
 party_is_public = True
 
-# نوع اللعبة (free_for_all أو teams أو co_op)
-session_type = "free_for_all"
-
-# المنفذ
+# المنفذ الافتراضي
 port = 43210
+
+# نوع الجلسة
+session_type = "free_for_all"
