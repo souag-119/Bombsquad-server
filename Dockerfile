@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-# تثبيت مكتبات النظام الأساسية وتثبيت python3 لتأمين البيئة
+# تثبيت المكتبات الديناميكية الضرورية التي يحتاجها محرّك اللعبة
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     curl \
@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y \
     tar \
     libcurl4 \
     libssl3 \
-    python3 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -20,18 +19,15 @@ RUN DOWNLOAD_URL=$(curl -s https://ballistica.net/downloads | grep -oP 'https://
     && tar -xzf server.tar.gz --strip-components=1 \
     && rm server.tar.gz
 
-# إنشاء رابط رمزي لـ python3.14 ليتعرف عليه أي سكريبت فرعي
-RUN ln -sf $(which python3) /usr/bin/python3.14 && \
-    ln -sf $(which python3) /usr/local/bin/python3.14
+# ربط النسخة المدمجة من Python داخل اللعبة بالنظام
+RUN ln -sf /app/dist/bin/python3.14 /usr/bin/python3.14 && \
+    ln -sf /app/dist/bin/python3.14 /usr/local/bin/python3.14
 
 # نسخ ملف الإعدادات
 COPY config.py /app/config.py
 
-# إعداد المسارات المباشرة لمكتبات اللعبة
-ENV PYTHONPATH="/app/dist/ba_data/python:/app"
-
-# فتح منفذ الـ Web Service
+# فتح المنفذ المطلوب لـ Render
 EXPOSE 10000
 
-# تشغيل محرك السيرفر مباشرة
-CMD ["python3", "-m", "bacommon.servermanager", "-no-stdin"]
+# تشغيل السيرفر باستخدام بيئة Python المدمجة التابعة لـ Ballistica مباشرة
+CMD ["/app/dist/bin/python3.14", "-m", "bacommon.servermanager", "-no-stdin"]
