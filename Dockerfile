@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-# تثبيت المكتبات الديناميكية الضرورية التي يحتاجها محرّك اللعبة
+# تثبيت المكتبات الأساسية للنظام
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     curl \
@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     tar \
     libcurl4 \
     libssl3 \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -19,15 +20,19 @@ RUN DOWNLOAD_URL=$(curl -s https://ballistica.net/downloads | grep -oP 'https://
     && tar -xzf server.tar.gz --strip-components=1 \
     && rm server.tar.gz
 
-# ربط النسخة المدمجة من Python داخل اللعبة بالنظام
+# ربط ملف Python المدمج بالمسار الذي يطلبه سكريبت التشغيل
 RUN ln -sf /app/dist/bin/python3.14 /usr/bin/python3.14 && \
     ln -sf /app/dist/bin/python3.14 /usr/local/bin/python3.14
+
+# ضبط مسارات المكتبات الديناميكية و Python لضمان عثور المحرك على libpython3.14.so
+ENV LD_LIBRARY_PATH="/app/dist/lib:/app/dist/syslibs:$LD_LIBRARY_PATH"
+ENV PYTHONPATH="/app/dist/ba_data/python:/app"
 
 # نسخ ملف الإعدادات
 COPY config.py /app/config.py
 
-# فتح المنفذ المطلوب لـ Render
+# فتح المنفذ الخاص بـ Render
 EXPOSE 10000
 
-# تشغيل السيرفر باستخدام بيئة Python المدمجة التابعة لـ Ballistica مباشرة
-CMD ["/app/dist/bin/python3.14", "-m", "bacommon.servermanager", "-no-stdin"]
+# تشغيل السيرفر المباشر
+CMD ["./bombsquad_server"]
