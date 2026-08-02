@@ -1,15 +1,12 @@
-FROM ubuntu:22.04
+FROM python:3.11-slim
 
-# إعداد البيئة وتثبيت المكتبات المطلوبة
-ENV DEBIAN_FRONTEND=noninteractive
+# تثبيت الأدوات والمكتبات اللازمة للعبة
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
     tar \
     libcurl4 \
-    libssl3 \
-    python3 \
-    python3-pip \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -21,15 +18,15 @@ RUN DOWNLOAD_URL=$(curl -s https://ballistica.net/downloads | grep -oP 'https://
     && tar -xzf server.tar.gz --strip-components=1 \
     && rm server.tar.gz
 
-# حل مشكلة طلب python3.14 بربطه بنسخة python3 الموجودة بالنظام
+# ربط python3.14 و python3 بحزمة Python 3.11 الحالية (التي تحتوي على tomllib)
 RUN ln -sf $(which python3) /usr/bin/python3.14 && \
     ln -sf $(which python3) /usr/local/bin/python3.14
 
 # نسخ ملف الإعدادات
 COPY config.py /app/config.py
 
-# فتح المنفذ المطلوب لـ Render
+# فتح المنفذ الخاص بـ Render
 EXPOSE 10000
 
-# تشغيل السيرفر مع -no-stdin لتجنب الإغلاق التلقائي
+# تشغيل السيرفر بدون شاشة تفاعلية
 CMD ["./bombsquad_server", "-no-stdin"]
